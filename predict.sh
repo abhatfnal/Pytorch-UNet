@@ -1,20 +1,7 @@
 
-model=model/unet-l23-cosmic500-e50-t1/CP50-450.pth
-# model=model/unet-lt-cosmic500-e50/CP50-450.pth
-# model=model/unet-explr-l23-cosmic500-e100/CP40-450.pth
-# model=model/unet-l23-beam-cosmic500-e100/CP100-450.pth
+model=/scratch/7DayLifetime/abhat/wirecell/dnn_roi_icarus/training/bnb_cosmics/UNet/V_Plane/best_loss.pth
 
-# test=/home/yuhw/wc/wct-analysis/ml-sp/backup/eval-dune-collab-2020-01/nf-on/eval-87-85/g4-rec-0.h5
-# test=/home/yuhw/wc/wct-analysis/ml-sp/backup/eval-dune-collab-2020-01/nf-on/eval-87-87/g4-rec-0.h5
-# test=eval-jinst-resp/eval-87-87/g4-rec-0.h5
-# test=test/data-0.h5
-# test=data/cosmic-rec-0.h5
-test=data/cosmic-rec-0-v2-test.h5
-# test=data/beam-cosmic-rec-0.h5
+test=/exp/sbnd/data/users/abhat/wirecell_data/dnn_roi/ICARUS/81858535_45/tpc0_plane1_rec.h5
 
-model=test2/CP49.pth
-model=ts-model/unet-l23-cosmic500-e50.ts
-test=data/g4-rec-r9.h5
 
-# 456, 488, 490, 497
-python predict.py -m ${model} --viz --no-save --no-crf --input ${test} --range 100 109 --mask-threshold 0.5
+python predict.py -m ${model} --viz --no-save --no-crf --input ${test} --range 9 10 --mask-threshold 0.5

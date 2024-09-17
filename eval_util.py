@@ -114,6 +114,45 @@ def eval_pixel(f0, f1, th0 = 0, th1 = 0.5):
     # return [num, den]
     return num/den
 
+# def eval_eff_pur(net, dataset, th=0.5, gpu=False):
+#     eff_pix = 0
+#     pur_pix = 0
+#     eff_roi = 0
+#     pur_roi = 0
+#     for i, b in enumerate(dataset):
+#         img = b[0]
+#         mask_true = b[1]
+
+#         if net == "trad":
+#             # print("Traditional ROI prediction")
+#             mask_pred = img
+
+#         else:
+#             # print("DNN ROI prediction")
+#             img = torch.from_numpy(img).unsqueeze(0)
+    
+#             if gpu:
+#                 img = img.cuda()
+    
+#             with torch.no_grad():
+#                 mask_pred = net(img).squeeze().cpu().numpy()
+
+#         mask_true = np.transpose(mask_true, [1, 0])
+#         mask_pred = np.transpose(mask_pred, [1, 0])
+
+#         eff_pix = eff_pix + eval_pixel(mask_true, mask_pred, 0.5, th)
+#         pur_pix = pur_pix + eval_pixel(mask_pred, mask_true, th, 0.5)
+
+#         eff_roi = eff_roi + eval_roi(mask_true, mask_pred, 0.5, th)
+#         pur_roi = pur_roi + eval_roi(mask_pred, mask_true, th, 0.5)
+    
+#     eff_pix = eff_pix/(i+1)
+#     pur_pix = pur_pix/(i+1)
+#     eff_roi = eff_roi/(i+1)
+#     pur_roi = pur_roi/(i+1)
+
+#     return [eff_pix, pur_pix, eff_roi, pur_roi]
+
 def eval_eff_pur(net, dataset, th=0.5, gpu=False):
     eff_pix = 0
     pur_pix = 0
@@ -124,11 +163,13 @@ def eval_eff_pur(net, dataset, th=0.5, gpu=False):
         mask_true = b[1]
 
         if net == "trad":
-            # print("Traditional ROI prediction")
+            # Traditional ROI prediction
             mask_pred = img
-
         else:
-            # print("DNN ROI prediction")
+            # DNN ROI prediction
+            if isinstance(img, torch.Tensor):
+                img = img.cpu().numpy()  # Ensure img is a NumPy array
+            
             img = torch.from_numpy(img).unsqueeze(0)
     
             if gpu:
@@ -137,6 +178,13 @@ def eval_eff_pur(net, dataset, th=0.5, gpu=False):
             with torch.no_grad():
                 mask_pred = net(img).squeeze().cpu().numpy()
 
+        # Convert mask_true and mask_pred to NumPy arrays if they are tensors
+        if isinstance(mask_true, torch.Tensor):
+            mask_true = mask_true.cpu().numpy()
+        if isinstance(mask_pred, torch.Tensor):
+            mask_pred = mask_pred.cpu().numpy()
+
+        # Transpose after ensuring they are NumPy arrays
         mask_true = np.transpose(mask_true, [1, 0])
         mask_pred = np.transpose(mask_pred, [1, 0])
 
@@ -152,3 +200,6 @@ def eval_eff_pur(net, dataset, th=0.5, gpu=False):
     pur_roi = pur_roi/(i+1)
 
     return [eff_pix, pur_pix, eff_roi, pur_roi]
+
+
+
