@@ -429,9 +429,9 @@ def train_net(net,
 
     # Define train, validation, and test datasets using the sample and target datasets
     iddataset = {}
-    iddataset['train'] = list(1 + strain + np.arange(ntrain))
-    iddataset['val']   = list(1 + sval + np.arange(nval))
-    iddataset['test']  = list(1 + stest + np.arange(ntest))
+    iddataset['train'] = list(strain + np.arange(ntrain))
+    iddataset['val']   = list(sval + np.arange(nval))
+    iddataset['test']  = list(stest + np.arange(ntest))
     np.random.shuffle(iddataset['train'])
     np.random.shuffle(iddataset['val'])
     np.random.shuffle(iddataset['test'])
@@ -476,8 +476,8 @@ def train_net(net,
     data_loader_args = {
         'batch_size': batch_size,
         'shuffle': True,  
-        'num_workers': 0,  
-        'pin_memory': False,
+        'num_workers': 3,  
+        'pin_memory': True,
         'drop_last': False,
     }
 
@@ -568,6 +568,7 @@ def train_net(net,
         epoch_loss = epoch_loss / len(train_loader)
         print('Epoch finished ! Loss: {:.6f}'.format(epoch_loss))
         writer.add_scalar('loss/train', epoch_loss, epoch)
+        print('{:.4f}, {:.6f}'.format(epoch, epoch_loss), file=outfile_loss, flush=True)
 
         # if save_cp:
         #     torch.save(net.state_dict(), dir_checkpoint + 'CP{}.pth'.format(epoch))
@@ -593,7 +594,10 @@ def train_net(net,
                 torch.save(net.state_dict(), dir_checkpoint + '/best_loss.pth')
                 print("Saved best loss model.")  # Add print to confirm saving
         
-        print("Validation Dice Coeff: {:.4f}, Loss: {:.6f}".format(val_dice, val_loss))
+        print("Validation Dice Coeff: {:.4f}, Loss: {:.66f}".format(val_dice, val_loss))
+        print('{:.4f}, {:.6f}'.format(epoch, val_dice), file=outfile_eval_dice, flush=True)
+        print('{:.4f}, {:.6f}'.format(epoch, val_loss), file=outfile_eval_loss, flush=True)
+
         
         # After validation
         print("Validation completed, starting the testing phase...")
