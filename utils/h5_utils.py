@@ -2,6 +2,7 @@ import os
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 def load(file, event, tags):
     """Loads the images from the HDF5 file based on tags."""
@@ -40,7 +41,7 @@ def plot_mask(mask, savename=""):
     plt.xlabel("wire")
     plt.ylabel("tick")
     plt.savefig(savename + "predict_vis.png", bbox_inches="tight", dpi=200)
-    print("figure saved")
+    #print("figure saved")
 
 def get_hwc_img(file, event, tags, scale, crop0, crop1, norm):
     """From a list of tuples, returns the correct cropped img"""
@@ -77,6 +78,12 @@ def get_masks(file, events, tags, scale, crop0, crop1, threshold):
         im = im.reshape(im.shape[0], im.shape[1])
         im = rebin(im, [im.shape[0] // scale[0], im.shape[1] // scale[1]])
         im = im[crop0[0]:crop0[1], crop1[0]:crop1[1]]
-        im[im <= threshold] = 0
-        im[im > threshold] = 1
+        # im[im <= threshold] = 0
+        if threshold is not None:
+            im[im <= threshold] = 0  # Apply thresholding only if it's not None
+
+        # im[im > threshold] = 1
+        if threshold is not None:
+            im[im > threshold] = 1  # Apply thresholding only if a valid threshold is provided
+
         yield im

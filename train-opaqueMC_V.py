@@ -196,7 +196,7 @@ def lr_exp_decay(optimizer, lr0, gamma, epoch):
 #     drop_last=False  # Drop the last incomplete batch
 #     prefetch_factor=2  # Number of batches to prefetch
 #     persistent_workers=False  # Keep data loading workers persistent
-    
+
 #     data_loader_args = {
 #         'batch_size': batch_size,
 #         'shuffle': True,  # Shuffle training data
@@ -211,7 +211,7 @@ def lr_exp_decay(optimizer, lr0, gamma, epoch):
 #     # train
 #     if sepoch > 0 :
 #         net.load_state_dict(torch.load('{}/CP{}.pth'.format(dir_checkpoint, sepoch-1)))
-    
+
 #     optimizer = optim.SGD(net.parameters(), 
 #                           lr=lr, 
 #                           momentum=0.9, 
@@ -476,9 +476,10 @@ def train_net(net,
     data_loader_args = {
         'batch_size': batch_size,
         'shuffle': True,  
-        'num_workers': 3,  
+        'num_workers': 0,  
         'pin_memory': True,
         'drop_last': False,
+        # 'persistent_workers' :True
     }
 
     # Load training dataset
@@ -534,7 +535,8 @@ def train_net(net,
 
 
     if sepoch > 0 :
-        net.load_state_dict(torch.load('{}/CP{}.pth'.format(dir_checkpoint, sepoch-1)))
+        # net.load_state_dict(torch.load('{}/CP{}.pth'.format(dir_checkpoint, sepoch-1)))
+        net = torch.jit.load('{}/CP{}.pth'.format(dir_checkpoint, sepoch-1))
 
     # Optimizer
     # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=0.0005)
@@ -573,7 +575,8 @@ def train_net(net,
         # if save_cp:
         #     torch.save(net.state_dict(), dir_checkpoint + 'CP{}.pth'.format(epoch))
 
-        torch.save(net.state_dict(), dir_checkpoint + 'CP{}.pth'.format(epoch))
+        # torch.save(net.state_dict(), dir_checkpoint + 'CP{}.pth'.format(epoch))
+        torch.jit.save(torch.jit.script(net), dir_checkpoint + 'CP{}.pth'.format(epoch))
         print('Checkpoint e{} saved !'.format(epoch))
 
         # Validation
@@ -586,12 +589,14 @@ def train_net(net,
         
             if val_dice > best_val_dice:
                 best_val_dice = val_dice
-                torch.save(net.state_dict(), dir_checkpoint + '/best_dice.pth')
+                # torch.save(net.state_dict(), dir_checkpoint + '/best_dice.pth')
+                torch.jit.save(torch.jit.script(net), dir_checkpoint + '/best_dice.pth')
                 print("Saved best dice model.")  # Add print to confirm saving
         
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                torch.save(net.state_dict(), dir_checkpoint + '/best_loss.pth')
+                # torch.save(net.state_dict(), dir_checkpoint + '/best_loss.pth')
+                torch.jit.save(torch.jit.script(net), dir_checkpoint + '/best_loss.pth')
                 print("Saved best loss model.")  # Add print to confirm saving
         
         print("Validation Dice Coeff: {:.4f}, Loss: {:.66f}".format(val_dice, val_loss))

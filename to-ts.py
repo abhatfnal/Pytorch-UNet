@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 import torch
-import torchvision
+# import torchvision
 
 from unet import UNet
 from uresnet import UResNet
@@ -30,7 +30,7 @@ def count_params(net):
 
 if __name__ == "__main__":
     args = get_args()
-    input_channels = 3
+    input_channels = 2
     output_channels = 1
     
     net = UNet(input_channels, output_channels)
@@ -41,17 +41,28 @@ if __name__ == "__main__":
 
     example = torch.rand(1, input_channels, 800, 600)
     
+    # if args.gpu:
+    #     net.cuda()
+    #     net.load_state_dict(torch.load(args.model))
+    #     sm = torch.jit.trace(net, example.cuda())
+    #     output = net(example.cuda())
+    #     # print(output[0][0][0])
+    # else:
+    #     net.cpu()
+    #     net.load_state_dict(torch.load(args.model, map_location='cpu'))
+    #     sm = torch.jit.trace(net, example)
+    #     output = net(example)
+    #     # print(output[0][0][0])
+
     if args.gpu:
+        net = torch.jit.load(args.model)
         net.cuda()
-        net.load_state_dict(torch.load(args.model))
         sm = torch.jit.trace(net, example.cuda())
         output = net(example.cuda())
-        # print(output[0][0][0])
     else:
-        net.cpu()
-        net.load_state_dict(torch.load(args.model, map_location='cpu'))
+        net = torch.jit.load(args.model, map_location='cpu')
         sm = torch.jit.trace(net, example)
         output = net(example)
-        # print(output[0][0][0])
 
-    sm.save('ts-model.ts')
+
+    sm.save('UNet-opaqueMC_Plane0.ts')

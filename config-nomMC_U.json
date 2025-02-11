@@ -1,0 +1,21 @@
+{
+    "dir_checkpoint": "/scratch/7DayLifetime/abhat/wirecell/dnn_roi_icarus/training/mixed_samples/nom/U_Plane/SGD/",
+    
+    "batch_size":    8,
+    "learning_rate": 0.001,
+    "sample_list": "/exp/sbnd/data/users/abhat/wirecell_data/dnn_roi/ICARUS/samples/hpsee_cosmics-nomMC-5_plane0_rec.file",
+    "target_list": "/exp/sbnd/data/users/abhat/wirecell_data/dnn_roi/ICARUS/samples/hpsee_cosmics-nomMC-5_plane0_tru.file",
+    
+    "start_epoch": 0,
+    "nepoch":      100,
+    
+    "scale":       [1,8],
+    "x_range":     [0,2112],
+    "y_range":     [0,4096],
+    "z_scale":     2000,
+    "dtype":       "float16",
+    "truth_th":    100,
+    
+    "im_tags": ["frame_looseLf", "frame_mp3ROI"],
+    "ma_tags": ["frame_deposplat"]
+}
